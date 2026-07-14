@@ -3,3 +3,4 @@ set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
 .venv/bin/python -m pytest -q
+./scripts/scan-sensitive.sh
