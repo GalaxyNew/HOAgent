@@ -1,0 +1,21 @@
+# Runtime and local data
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+
+# Projection/runtime data
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+logs/
+data/
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/
