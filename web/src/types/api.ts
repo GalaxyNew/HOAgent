@@ -5,7 +5,7 @@ export interface SourceMeta {
   source_ref: string;
   source_hash: string;
   last_synced_at: string | null;
-  freshness: 'fresh' | 'stale' | 'empty' | 'error' | 'offline' | 'conflict';
+  freshness: 'fresh' | 'stale' | 'empty' | 'error' | 'offline' | 'conflict' | 'unknown';
   request_id?: string;
 }
 

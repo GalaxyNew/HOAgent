@@ -19,7 +19,7 @@ export function BusinessPage() {
           {entities.meta && <SourceMetaCard meta={entities.meta} />}
         </div>
         <div className="mt-2 overflow-x-auto rounded-xl border border-[#D6E1DB]">
-          <StateContainer status={entities.status} error={entities.error} empty={!entities.data || entities.data.length === 0}>
+          <StateContainer status={entities.status} error={entities.error} empty={!entities.data || entities.data.length === 0} onRecover={entities.refetch}>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#D6E1DB] bg-[#F7FAF8] text-xs uppercase tracking-wide text-[#64716B]">
@@ -49,7 +49,7 @@ export function BusinessPage() {
           {rels.meta && <SourceMetaCard meta={rels.meta} />}
         </div>
         <div className="mt-2 overflow-x-auto rounded-xl border border-[#D6E1DB]">
-          <StateContainer status={rels.status} error={rels.error} empty={!rels.data || rels.data.length === 0}>
+          <StateContainer status={rels.status} error={rels.error} empty={!rels.data || rels.data.length === 0} onRecover={rels.refetch}>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#D6E1DB] bg-[#F7FAF8] text-xs uppercase tracking-wide text-[#64716B]">

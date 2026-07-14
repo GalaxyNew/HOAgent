@@ -11,11 +11,11 @@ export function SearchPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState<ApiError | null>(null);
 
-  const doSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const runSearch = () => {
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) return;
     setStatus('loading');
-    api.search(query)
+    api.search(normalizedQuery)
       .then((res) => {
         setResults(res.data);
         setMeta(res.meta);
@@ -28,6 +28,11 @@ export function SearchPage() {
         setStatus('error');
         setError(err);
       });
+  };
+
+  const doSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    runSearch();
   };
 
   const empty = status === 'success' && (!results || results.length === 0);
@@ -62,7 +67,7 @@ export function SearchPage() {
 
       {status !== 'idle' && (
         <div className="mt-4 space-y-2">
-          <StateContainer status={status} error={error} empty={empty}>
+          <StateContainer status={status} error={error} empty={empty} onRecover={runSearch}>
             {results?.map((r: any) => (
               <div
                 key={r.chunk_id}
