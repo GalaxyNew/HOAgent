@@ -4,7 +4,8 @@
   "description": "HOAgent 只读运营管理台",
   "icon": "chart",
   "version": "0.1.0",
-  "tab": "operations",
+  "tab": {"path":"/charlie-cockpit","position":"after:analytics"},
+  "slots": [],
   "entry": "dist/index.js",
   "css": "dist/style.css"
 }

@@ -8,7 +8,7 @@ declare global {
       React?: typeof React;
       fetchJSON<T>(path: string): Promise<T>;
     };
-    HERMES_PLUGINS?: {
+    __HERMES_PLUGINS__?: {
       register(name: string, component: React.ComponentType): void;
     };
   }

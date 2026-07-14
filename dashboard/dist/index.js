@@ -403,7 +403,7 @@ function T() {
   const [t, a] = f("overview"), n = J[t];
   return /* @__PURE__ */ e(E.Provider, { value: { view: t, navigate: a }, children: /* @__PURE__ */ e(M, { children: /* @__PURE__ */ e(n, {}) }) });
 }
-typeof window < "u" && window.HERMES_PLUGINS && window.HERMES_PLUGINS.register("charlie-cockpit", T);
+typeof window < "u" && window.__HERMES_PLUGINS__ && window.__HERMES_PLUGINS__.register("charlie-cockpit", T);
 export {
   T as CharlieCockpitPage
 };
