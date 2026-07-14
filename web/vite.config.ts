@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: [
+      { find: 'react/jsx-dev-runtime', replacement: resolve(__dirname, 'src/host-jsx-dev-runtime.ts') },
       { find: 'react/jsx-runtime', replacement: resolve(__dirname, 'src/host-jsx-runtime.ts') },
       { find: 'react', replacement: resolve(__dirname, 'src/host-react.ts') },
       { find: '@', replacement: resolve(__dirname, 'src') },
@@ -17,7 +18,10 @@ export default defineConfig({
     sourcemap: false,
     lib: {
       entry: resolve(__dirname, 'src/plugin.tsx'),
-      formats: ['es'],
+      // Dashboard injects plugin bundles as classic <script> tags, so an ESM
+      // bundle would fail before it reaches the registry call.
+      formats: ['iife'],
+      name: 'CharlieCockpitPlugin',
       fileName: () => 'index.js',
       cssFileName: 'style',
     },
