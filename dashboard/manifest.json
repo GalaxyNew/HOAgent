@@ -8,5 +8,8 @@
     "path": "/charlie-cockpit",
     "position": "after:analytics"
   },
+  "slots": [],
+  "entry": "dist/index.js",
+  "css": "dist/style.css",
   "api": "plugin_api.py"
 }
