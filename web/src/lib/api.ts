@@ -7,7 +7,7 @@ interface HermesPluginSdk {
   readonly request?: unknown;
 }
 
-function getTrustedHostSdk(): HermesPluginSdk | null {
+export function getTrustedHostSdk(): HermesPluginSdk | null {
   if (typeof window === 'undefined') return null;
   const sdk = (window as Window & { __HERMES_PLUGIN_SDK__?: HermesPluginSdk })
     .__HERMES_PLUGIN_SDK__;
@@ -18,7 +18,7 @@ async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
   // Fail closed before any network activity when the plugin is opened outside
   // the trusted Hermes Dashboard host. No client-side token or fallback exists.
   if (!getTrustedHostSdk()) {
-    throw new ApiError(401, 'host-unavailable', '仅支持 Hermes Dashboard 宿主访问');
+    throw new ApiError(403, 'host-unavailable', '仅支持 Hermes Dashboard 宿主访问');
   }
 
   const resp = await fetch(`${API_BASE}${path}`);
