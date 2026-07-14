@@ -1,7 +1,54 @@
 @import "tailwindcss";
 
-.charlie-cockpit { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+.charlie-cockpit {
+  --cc-canvas: #F3F6F4;
+  --cc-surface: rgba(255, 255, 255, .94);
+  --cc-surface-muted: #F7FAF8;
+  --cc-ink: #12201C;
+  --cc-ink-soft: #263B34;
+  --cc-muted: #64716B;
+  --cc-muted-soft: #809089;
+  --cc-border: #D6E1DB;
+  --cc-border-strong: #B9CBC2;
+  --cc-brand: #0F766E;
+  --cc-brand-hover: #0B5C56;
+  --cc-brand-soft: #DDF3EC;
+  --cc-row-hover: #F0F6F3;
+  --cc-warning: #B45309;
+  --cc-warning-soft: #FFF1DD;
+  --cc-danger: #B42318;
+  --cc-danger-soft: #FDEBE7;
+  --cc-shadow: 0 10px 28px rgba(18, 32, 28, .08);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  color: var(--cc-ink);
+  background: var(--cc-canvas);
+}
+
 .charlie-cockpit *, .charlie-cockpit *::before, .charlie-cockpit *::after { box-sizing: border-box; }
 .charlie-cockpit button, .charlie-cockpit input { min-height: 44px; }
-.charlie-cockpit button:focus-visible, .charlie-cockpit input:focus-visible { outline: 3px solid rgba(15,118,110,.25); outline-offset: 2px; }
+.charlie-cockpit button:focus-visible, .charlie-cockpit input:focus-visible { outline: 3px solid rgba(15, 118, 110, .25); outline-offset: 2px; }
 .charlie-cockpit table { min-width: 640px; }
+.charlie-cockpit ::-webkit-scrollbar { width: 8px; height: 8px; }
+.charlie-cockpit ::-webkit-scrollbar-thumb { background: var(--cc-border-strong); border-radius: 8px; }
+
+.cc-panel { border: 1px solid var(--cc-border); border-radius: 12px; background: var(--cc-surface); box-shadow: var(--cc-shadow); }
+.cc-table-wrap { overflow-x: auto; border: 1px solid var(--cc-border); border-radius: 12px; background: var(--cc-surface); }
+.cc-table-head { border-bottom: 1px solid var(--cc-border); background: var(--cc-surface-muted); color: var(--cc-muted); }
+.cc-table-body { color: var(--cc-muted); }
+.cc-table-body > tr { border-color: #E5ECE8; }
+.cc-table-body > tr:hover { background: var(--cc-row-hover); }
+.cc-page-title { color: var(--cc-ink); }
+.cc-section-title, .cc-code { color: var(--cc-ink-soft); }
+.cc-muted { color: var(--cc-muted); }
+.cc-muted-soft { color: var(--cc-muted-soft); }
+.cc-brand-button { background: var(--cc-brand); color: white; }
+.cc-brand-button:hover { background: var(--cc-brand-hover); }
+.cc-brand-button:disabled { opacity: .5; }
+.cc-input { border: 1px solid var(--cc-border-strong); background: var(--cc-surface-muted); color: var(--cc-ink); }
+.cc-input::placeholder { color: var(--cc-muted-soft); }
+.cc-input:focus { border-color: var(--cc-brand); outline: none; box-shadow: 0 0 0 1px var(--cc-brand); }
+.cc-pill { display: inline-block; border-radius: 999px; padding: .125rem .5rem; font-size: .75rem; font-weight: 500; }
+.cc-pill-success { background: var(--cc-brand-soft); color: var(--cc-brand); }
+.cc-pill-muted { background: #EEF3F0; color: var(--cc-muted); }
+.cc-pill-warning { background: var(--cc-warning-soft); color: var(--cc-warning); }
+.cc-pill-danger { background: var(--cc-danger-soft); color: var(--cc-danger); }
