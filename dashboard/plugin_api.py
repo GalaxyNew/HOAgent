@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import sys
 import uuid
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -21,6 +22,14 @@ from typing import Any
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import JSONResponse
+
+# Hermes loads this file directly via spec_from_file_location(), so it does
+# not add the plugin root to sys.path. Add only this package's own root before
+# importing the shared Cockpit migration module.
+_PLUGIN_ROOT = Path(__file__).resolve().parents[1]
+_PLUGIN_ROOT_STR = str(_PLUGIN_ROOT)
+if _PLUGIN_ROOT_STR not in sys.path:
+    sys.path.insert(0, _PLUGIN_ROOT_STR)
 
 from cockpit.db import migrate_up
 
