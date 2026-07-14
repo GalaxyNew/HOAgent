@@ -12,6 +12,7 @@ for pytest and local curl testing only.
 """
 from __future__ import annotations
 
+import os
 import sqlite3
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -21,9 +22,15 @@ from typing import Any
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from cockpit.db import migrate_up
+
 # ── Database helpers (shared with standalone app) ──────────────────────────
 
 def _default_db_path() -> Path:
+    """Resolve the projection DB, allowing an explicit OPS_DB override."""
+    configured_path = os.environ.get("OPS_DB")
+    if configured_path:
+        return Path(configured_path)
     return Path(__file__).resolve().parents[1] / "data" / "ops.db"
 
 
@@ -36,30 +43,6 @@ def _connect(db_path: Path):
 
 
 def _ensure_migrated(db_path: Path) -> None:
-    """Run all migrations if the DB is empty or stale."""
-    migrations_dir = Path(__file__).resolve().parents[1] / "migrations"
-    if not migrations_dir.is_dir():
-        return
-    conn = _connect(db_path)
-    try:
-        conn.executescript("""
-            CREATE TABLE IF NOT EXISTS schema_version(
-                version TEXT PRIMARY KEY,
-                applied_at TEXT DEFAULT (datetime('now'))
-            );
-        """)
-        applied = {row[0] for row in conn.execute("SELECT version FROM schema_version")}
-        for sql_file in sorted(migrations_dir.glob("*_up.sql")):
-            version = sql_file.name.removesuffix("_up.sql")
-            if version in applied:
-                continue
-            conn.executescript(sql_file.read_text(encoding="utf-8"))
-            conn.execute(
-                "INSERT INTO schema_version(version) VALUES (?)", (version,)
-            )
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def _now() -> str:
@@ -190,7 +173,7 @@ def build_plugin_router(db_path: Path | None = None) -> APIRouter:
 # ``router`` attribute (an APIRouter). We build it lazily so the DB path
 # can be overridden via OPS_DB env var.
 
-_db_path = Path(__file__).resolve().parents[1] / "data" / "ops.db"
+_db_path = _default_db_path()
 if _db_path.parent.exists():
     _ensure_migrated(_db_path)
 
