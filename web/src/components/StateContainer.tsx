@@ -4,11 +4,13 @@ export function StateContainer({
   status,
   error,
   empty,
+  onRecover,
   children,
 }: {
   status: 'idle' | 'loading' | 'success' | 'error';
   error?: { kind: string; message: string } | null;
   empty?: boolean;
+  onRecover?: () => void;
   children: ReactNode;
 }) {
   if (status === 'loading') {
@@ -35,6 +37,11 @@ export function StateContainer({
           {isHostUnavailable ? '仅支持 Hermes Dashboard 宿主访问' : isForbidden ? '403 禁止访问' : isOffline ? '服务离线' : '请求出错'}
         </p>
         <p className="cc-muted mt-1 text-xs">{error.message}</p>
+        {onRecover && (
+          <button type="button" onClick={onRecover} className="cc-recovery-button mt-5 px-4 text-sm font-medium">
+            重试
+          </button>
+        )}
       </div>
     );
   }
@@ -46,6 +53,11 @@ export function StateContainer({
           <span className="text-2xl">📭</span>
         </div>
         <p className="cc-muted mt-3 text-sm">暂无数据</p>
+        {onRecover && (
+          <button type="button" onClick={onRecover} className="cc-recovery-button mt-5 px-4 text-sm font-medium">
+            刷新数据
+          </button>
+        )}
       </div>
     );
   }

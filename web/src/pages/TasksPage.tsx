@@ -4,7 +4,7 @@ import { StateContainer } from '@/components/StateContainer';
 import { SourceMetaCard } from '@/components/SourceMeta';
 
 export function TasksPage() {
-  const { data, meta, status, error } = useApi(() => api.tasks());
+  const { data, meta, status, error, refetch } = useApi(() => api.tasks());
   const empty = !data || data.length === 0;
 
   return (
@@ -17,7 +17,7 @@ export function TasksPage() {
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-[#D6E1DB]">
-        <StateContainer status={status} error={error} empty={empty}>
+        <StateContainer status={status} error={error} empty={empty} onRecover={refetch}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#D6E1DB] bg-[#F7FAF8] text-xs uppercase tracking-wide text-[#64716B]">

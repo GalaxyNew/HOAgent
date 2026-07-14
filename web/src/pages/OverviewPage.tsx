@@ -47,7 +47,7 @@ export function OverviewPage() {
       <div className="mt-6 rounded-xl border border-[#D6E1DB] bg-white/95 p-4">
         <h2 className="text-sm font-medium text-[#263B34]">服务健康</h2>
         <div className="mt-3">
-          <StateContainer status={health.status} error={health.error}>
+          <StateContainer status={health.status} error={health.error} onRecover={health.refetch}>
             <div className="flex items-center gap-3 text-sm">
               <span className={`h-2.5 w-2.5 rounded-full ${serviceUp ? 'bg-[#0F766E]' : 'bg-red-400'}`} />
               <span className="text-[#12201C]">{health.data?.service ?? '—'}</span>
