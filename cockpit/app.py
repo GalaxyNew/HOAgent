@@ -29,7 +29,7 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         db.parent.mkdir(parents=True, exist_ok=True)
     _ensure_migrated(db)
     app = FastAPI(title="Charlie Cockpit (standalone, no auth)", version="0.1.0")
-    app.include_router(build_plugin_router(db))
+    app.include_router(build_plugin_router(db), prefix="/api/plugins/charlie-cockpit")
     return app
 
 

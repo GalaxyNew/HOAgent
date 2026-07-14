@@ -123,7 +123,7 @@ def _response(request: Request, db_path: Path, data: Any, source_refs: list[str]
 
 # ── Plugin router (no auth — host middleware owns it) ──────────────────────
 
-PREFIX = "/api/plugins/charlie-cockpit/v1"
+PREFIX = "/v1"
 
 
 def build_plugin_router(db_path: Path | None = None) -> APIRouter:
@@ -208,7 +208,7 @@ def create_standalone_app(db_path: Path | None = None) -> FastAPI:
     db = db_path or _default_db_db_path_safely()
     _ensure_migrated(db)
     app = FastAPI(title="Charlie Cockpit (standalone, no auth)", version="0.1.0")
-    app.include_router(build_plugin_router(db))
+    app.include_router(build_plugin_router(db), prefix="/api/plugins/charlie-cockpit")
     return app
 
 
