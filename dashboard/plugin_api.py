@@ -43,6 +43,9 @@ def _connect(db_path: Path):
 
 
 def _ensure_migrated(db_path: Path) -> None:
+    """Create the DB parent and apply the authoritative migration runner."""
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    migrate_up(db_path)
 
 
 def _now() -> str:
