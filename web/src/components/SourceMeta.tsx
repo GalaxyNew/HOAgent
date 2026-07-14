@@ -1,16 +1,8 @@
 import type { SourceMeta } from '@/types/api';
-
-const freshnessConfig: Record<string, { label: string; color: string }> = {
-  fresh: { label: '新鲜', color: 'text-[var(--cc-brand)]' },
-  stale: { label: '过期', color: 'text-[var(--cc-warning)]' },
-  empty: { label: '空', color: 'cc-muted' },
-  error: { label: '错误', color: 'text-[var(--cc-danger)]' },
-  offline: { label: '离线', color: 'cc-muted-soft' },
-  conflict: { label: '冲突', color: 'text-[var(--cc-warning)]' },
-};
+import { getFreshnessConfig } from './freshness';
 
 export function FreshnessBadge({ freshness }: { freshness: string }) {
-  const cfg = freshnessConfig[freshness] ?? freshnessConfig.empty;
+  const cfg = getFreshnessConfig(freshness);
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-medium ${cfg.color}`}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
