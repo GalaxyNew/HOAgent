@@ -12,3 +12,14 @@ HOAgent 是查理资讯的 Agent 运营控制台项目入口。
 - 首个开发任务：GitHub Issue #1（T20260714-34）。
 
 详见 [`docs/00-总纲.md`](docs/00-总纲.md) 与 [`docs/PROGRESS.md`](docs/PROGRESS.md)。
+
+## M1 本地运行（仅回环）
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install 'fastapi>=0.115,<1' 'uvicorn>=0.30,<1' 'pytest>=8,<9' httpx2
+.venv/bin/python scripts/migrate.py up --db "$PWD/data/ops.db"
+OPS_DB="$PWD/data/ops.db" .venv/bin/uvicorn cockpit.app:app --host 127.0.0.1 --port 18734
+```
+
+只读 API 前缀：`/api/plugins/charlie-cockpit/v1`。M1 对齐 T20260714-34、DOC-04/05/06 与 DOC-07A/B：投影保持可删除重建，权威源不被写入。

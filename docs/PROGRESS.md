@@ -10,3 +10,10 @@
 ## 回滚
 
 若治理基线出现错误，使用 Git revert 回退该初始化提交；不得删除或重建用户指定仓库。
+
+## 2026-07-14｜M1 SQLite 与只读 API 骨架
+
+- 实现版本化 `001_stage1` up/down migration，启用 FK、WAL、5 秒 busy timeout。
+- 已实现回环 FastAPI 只读端点：health、tasks、agents、business entities/relationships、audit、search。
+- 当前 `OPS_DB=/Users/galaxyai/dev/HOAgent/data/ops.db`，本地 `BASE_URL=http://127.0.0.1:18734`，仅用于开发验证。
+- M1 仍不读取权威源正文、不提供写业务端点；来源适配、原子投影与异常矩阵在后续里程碑完成。
