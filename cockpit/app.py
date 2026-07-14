@@ -1,105 +1,37 @@
+"""Charlie Cockpit application.
+
+Production path: Hermes Dashboard mounts ``dashboard/plugin_api.py:router``
+at ``/api/plugins/charlie-cockpit/v1/``. The dashboard's own middleware
+(session-token or OAuth gated mode) handles all authentication.
+
+This module provides:
+- ``create_app(db_path)`` — standalone FastAPI app for **tests only** (no auth).
+- ``app`` — convenience standalone instance for ``uvicorn cockpit.app:app``.
+
+⚠️ The standalone app has NO authentication. It must NEVER be exposed
+   on a network. Production traffic goes through the Hermes Dashboard.
+"""
 from __future__ import annotations
-import os, sqlite3, uuid
-from datetime import UTC, datetime, timedelta
+
 from pathlib import Path
-from fastapi import APIRouter, FastAPI, HTTPException, Request, status
-from fastapi.responses import JSONResponse
-from .db import connect, migrate_up
 
-DB_PATH = Path(os.getenv("OPS_DB", Path(__file__).parents[1] / "data" / "ops.db"))
-PREFIX = "/api/plugins/charlie-cockpit/v1"
-READ_SCOPE = "charlie-cockpit.read"
+from dashboard.plugin_api import build_plugin_router, _ensure_migrated, _default_db_path
+from fastapi import FastAPI
 
-def now() -> str: return datetime.now(UTC).isoformat().replace('+00:00', 'Z')
-def parse_time(value: str | None) -> datetime | None:
-    if not value: return None
-    return datetime.fromisoformat(value.replace('Z', '+00:00'))
-def rows(db: Path, query: str, params: tuple = ()) -> list[dict]:
-    conn=connect(db)
-    try: return [dict(x) for x in conn.execute(query, params)]
-    finally: conn.close()
-def source_meta(db: Path, source_refs: list[str] | None = None) -> dict:
-    conn=connect(db)
-    try:
-        sql="SELECT source_ref,source_hash,last_success_at,sync_state FROM source_cursor"
-        params: tuple=()
-        if source_refs:
-            sql += " WHERE source_ref IN (" + ','.join('?' for _ in source_refs) + ")"; params=tuple(source_refs)
-        selected=[dict(row) for row in conn.execute(sql, params)]
-    finally: conn.close()
-    if not selected: return {"source_ref":"projection://empty","source_hash":"","last_synced_at":None,"freshness":"empty"}
-    states={r['sync_state'] for r in selected}
-    if 'conflict' in states: freshness='conflict'
-    elif 'offline' in states: freshness='offline'
-    elif 'failed' in states: freshness='error'
-    else:
-        last=max((r['last_success_at'] for r in selected if r['last_success_at']), default=None)
-        freshness='stale' if not last or parse_time(last) < datetime.now(UTC)-timedelta(minutes=5) else 'fresh'
-    newest=max(selected, key=lambda r: r['last_success_at'] or '')
-    return {"source_ref": newest['source_ref'], "source_hash":newest['source_hash'], "last_synced_at":newest['last_success_at'], "freshness":freshness}
-def response(request: Request, db: Path, data: object, source_refs: list[str] | None = None) -> JSONResponse:
-    meta=source_meta(db, source_refs); meta['request_id']=request.headers.get("x-request-id", str(uuid.uuid4()))
-    return JSONResponse({"data":data,"meta":meta})
-# Server-side token→scope mapping. Tokens are never accepted from client-supplied scope headers.
-# Loading is lazy per-request so env changes (e.g. test monkeypatch) take effect immediately.
-DEFAULT_DEV_TOKEN = 'charlie-cockpit-dev-read-token'
-
-def _load_token_scopes() -> dict[str, frozenset[str]]:
-    """Load token→scopes from env. Supports JSON mapping or single legacy token."""
-    import json
-    raw = os.getenv('CHARLIE_COCKPIT_TOKEN_SCOPES', '')
-    if raw:
-        try:
-            parsed = json.loads(raw)
-            return {k: frozenset(v) for k, v in parsed.items()}
-        except Exception:
-            pass
-    legacy = os.getenv('CHARLIE_COCKPIT_READ_TOKEN')
-    if legacy:
-        return {legacy: frozenset({READ_SCOPE})}
-    # Dev/default mode: emit a single read-only token so the service is usable locally.
-    # In production, set CHARLIE_COCKPIT_TOKEN_SCOPES or CHARLIE_COCKPIT_READ_TOKEN.
-    return {DEFAULT_DEV_TOKEN: frozenset({READ_SCOPE})}
-
-def require_read_scope(request: Request) -> None:
-    supplied = request.headers.get('authorization', '').removeprefix('Bearer ').strip()
-    token_scopes = _load_token_scopes()
-    scopes = token_scopes.get(supplied, frozenset())
-    if READ_SCOPE not in scopes:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='forbidden')
 
 def create_app(db_path: Path | None = None) -> FastAPI:
-    db=db_path or DB_PATH; db.parent.mkdir(parents=True, exist_ok=True); migrate_up(db)
-    app=FastAPI(title="Charlie Cockpit", version="0.1.0")
-    router=APIRouter(prefix=PREFIX, dependencies=[__import__('fastapi').Depends(require_read_scope)])
-    @router.get('/health')
-    def health(request: Request): return response(request, db, {"status":"ok","service":"charlie-cockpit-projection"})
-    @router.get('/tasks')
-    def tasks(request: Request):
-        result=rows(db,'SELECT * FROM task ORDER BY updated_at DESC'); return response(request,db,result,[r['source_ref'] for r in result])
-    @router.get('/agents')
-    def agents(request: Request):
-        result=rows(db,'SELECT * FROM agent ORDER BY name'); return response(request,db,result,[r['source_ref'] for r in result])
-    @router.get('/business/entities')
-    def entities(request: Request):
-        result=rows(db,'SELECT * FROM business_entity ORDER BY name'); return response(request,db,result,[r['source_ref'] for r in result])
-    @router.get('/business/relationships')
-    def relationships(request: Request):
-        result=rows(db,'SELECT * FROM business_relationship ORDER BY effective_from DESC'); return response(request,db,result,[r['source_ref'] for r in result])
-    @router.get('/audit')
-    def audit(request: Request):
-        result=rows(db,'SELECT * FROM audit_event ORDER BY occurred_at DESC'); return response(request,db,result,[r['source_ref'] for r in result])
-    @router.get('/search')
-    def search(request: Request, q: str=''):
-        if not q.strip(): return response(request, db, [])
-        result = rows(db,
-            "SELECT c.chunk_id, c.document_id, c.title_masked, c.summary_masked, c.tags "
-            "FROM knowledge_chunk_fts f "
-            "JOIN knowledge_chunk c ON c.chunk_id = f.rowid "
-            "JOIN knowledge_document d ON d.document_id = c.document_id "
-            "WHERE knowledge_chunk_fts MATCH ? "
-            "AND c.deleted_at IS NULL AND d.status = 'active' AND d.deleted_at IS NULL",
-            (q,))
-        return response(request, db, result)
-    app.include_router(router); return app
-app=create_app()
+    """Create a standalone FastAPI app for tests and local development.
+
+    ⚠️ NO AUTH — pytest and local curl only.
+    """
+    db = db_path or _default_db_path()
+    if db.parent.exists() or db_path:
+        db.parent.mkdir(parents=True, exist_ok=True)
+    _ensure_migrated(db)
+    app = FastAPI(title="Charlie Cockpit (standalone, no auth)", version="0.1.0")
+    app.include_router(build_plugin_router(db))
+    return app
+
+
+# Lazy standalone instance for ``uvicorn cockpit.app:app``
+app = create_app()

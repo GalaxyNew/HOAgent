@@ -1,0 +1,14 @@
+{
+  "name": "charlie-cockpit",
+  "label": "Charlie Cockpit",
+  "description": "Read-only projection of tasks, agents, business entities, audit events and knowledge search.",
+  "icon": "Telescope",
+  "version": "0.1.0",
+  "tab": {
+    "path": "/charlie-cockpit",
+    "position": "after:analytics"
+  },
+  "entry": "dist/index.js",
+  "css": "dist/style.css",
+  "api": "plugin_api.py"
+}
