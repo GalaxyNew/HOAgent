@@ -1,4 +1,6 @@
 import sqlite3
+from pathlib import Path
+
 import pytest
 from cockpit.db import connect, migrate_down, migrate_up
 
@@ -19,6 +21,41 @@ def test_up_down_and_integrity(tmp_path):
     assert migrate_down(db) == '001_stage1'
     conn = sqlite3.connect(db)
     assert conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='task'").fetchone() is None
+
+def test_legacy_003_alias_is_not_reapplied_and_migrates_to_006(tmp_path):
+    """A real historical typo must be treated as the corrected 003 migration."""
+    db = tmp_path / "legacy-003" / "ops.db"
+    assert migrate_up(db) == "006_sync_state_unknown"
+
+    # Construct the historical state from a 002 database, then apply the
+    # current 003 SQL while recording its old durable version name.
+    for expected in ("006_sync_state_unknown", "005_document_revocation_cascade", "004_governance_knowledge_fts", "003_temporal_update_guard"):
+        assert migrate_down(db) == expected
+    conn = connect(db)
+    migration = Path(__file__).resolve().parents[1] / "migrations" / "003_temporal_update_guard_up.sql"
+    conn.executescript("BEGIN IMMEDIATE;\n" + migration.read_text() + "\n"
+                       "INSERT INTO schema_version(version) VALUES ('003_temporaldate_guard');\nCOMMIT;")
+    conn.close()
+
+    # This must not execute 003 a second time and recreate its triggers.
+    assert migrate_up(db) == "006_sync_state_unknown"
+    conn = connect(db)
+    versions = {row[0] for row in conn.execute("SELECT version FROM schema_version")}
+    assert "003_temporaldate_guard" in versions
+    assert "003_temporal_update_guard" not in versions
+    assert conn.execute("SELECT name FROM sqlite_master WHERE type='trigger' AND name='trg_br_bu_no_overlap'").fetchone()
+    assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+    assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
+    conn.close()
+
+def test_connect_and_migrate_up_create_missing_parent_idempotently(tmp_path):
+    db = tmp_path / "cold" / "nested" / "ops.db"
+    assert not db.parent.exists()
+    conn = connect(db)
+    conn.close()
+    assert db.parent.exists()
+    assert migrate_up(db) == "006_sync_state_unknown"
+    assert migrate_up(db) == "006_sync_state_unknown"
 
 def test_update_overlap_trigger_rejects_overlap(tmp_path):
     db = tmp_path / 'ops.db'
