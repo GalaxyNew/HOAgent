@@ -1,0 +1,3 @@
+CREATE TRIGGER trg_br_bu_no_overlap BEFORE UPDATE OF left_entity_id,right_entity_id,relation_type,responsibility,effective_from,effective_to ON business_relationship BEGIN
+ SELECT CASE WHEN EXISTS(SELECT 1 FROM business_relationship b WHERE b.relationship_id<>OLD.relationship_id AND b.left_entity_id=NEW.left_entity_id AND b.right_entity_id=NEW.right_entity_id AND b.relation_type=NEW.relation_type AND b.responsibility=NEW.responsibility AND COALESCE(b.effective_to,'9999-12-31')>NEW.effective_from AND COALESCE(NEW.effective_to,'9999-12-31')>b.effective_from) THEN RAISE(ABORT,'business relationship effective range overlaps') END;
+END;

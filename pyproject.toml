@@ -1,0 +1,9 @@
+[project]
+name = "hoagent-charlie-cockpit"
+version = "0.1.0"
+description = "Read-only, rebuildable Charlie Cockpit projection"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
