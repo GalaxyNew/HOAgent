@@ -31,10 +31,16 @@ def _schema_versions(db_path: Path) -> list[str]:
         conn.close()
 
 
-def test_plugin_import_migrates_empty_ops_db_twice(tmp_path):
-    db = tmp_path / "empty" / "ops.db"
-    db.parent.mkdir()
+def test_plugin_import_creates_parent_and_rebuilds_deleted_ops_db_twice(tmp_path):
+    db = tmp_path / "missing-parent" / "ops.db"
 
+    _import_plugin(db)
+    _import_plugin(db)
+    assert _schema_versions(db)[-1] == "006_sync_state_unknown"
+
+    db.unlink()
+    for suffix in ("-wal", "-shm"):
+        db.with_name(db.name + suffix).unlink(missing_ok=True)
     _import_plugin(db)
     _import_plugin(db)
 
