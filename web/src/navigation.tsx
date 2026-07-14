@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from '@/host-react';
 
 export type View = 'overview' | 'tasks' | 'agents' | 'business' | 'audit' | 'search';
 

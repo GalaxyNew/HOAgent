@@ -1,7 +1,10 @@
 {
-  "id": "charlie-cockpit",
-  "name": "Charlie Cockpit",
+  "name": "charlie-cockpit",
+  "label": "Charlie Cockpit",
+  "description": "HOAgent 只读运营管理台",
+  "icon": "chart",
   "version": "0.1.0",
+  "tab": "operations",
   "entry": "dist/index.js",
   "css": "dist/style.css"
 }

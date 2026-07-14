@@ -4,7 +4,13 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { '@': resolve(__dirname, 'src') } },
+  resolve: {
+    alias: [
+      { find: 'react/jsx-runtime', replacement: resolve(__dirname, 'src/host-jsx-runtime.ts') },
+      { find: 'react', replacement: resolve(__dirname, 'src/host-react.ts') },
+      { find: '@', replacement: resolve(__dirname, 'src') },
+    ],
+  },
   build: {
     outDir: resolve(__dirname, '../dashboard/dist'),
     emptyOutDir: true,
@@ -14,13 +20,6 @@ export default defineConfig({
       formats: ['es'],
       fileName: () => 'index.js',
       cssFileName: 'style',
-    },
-    rollupOptions: {
-      // React is supplied by the Hermes Dashboard host; it must not be bundled.
-      external: ['react', 'react/jsx-runtime'],
-      output: {
-        globals: { react: 'React' },
-      },
     },
   },
 });

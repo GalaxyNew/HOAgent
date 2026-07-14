@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState } from '@/host-react';
+import type { ComponentType } from 'react';
 import { Layout } from '@/components/Layout';
 import { OverviewPage } from '@/pages/OverviewPage';
 import { TasksPage } from '@/pages/TasksPage';
@@ -8,7 +9,7 @@ import { AuditPage } from '@/pages/AuditPage';
 import { SearchPage } from '@/pages/SearchPage';
 import { NavigationContext, type View } from '@/navigation';
 
-const views: Record<View, React.ComponentType> = {
+const views: Record<View, ComponentType> = {
   overview: OverviewPage,
   tasks: TasksPage,
   agents: AgentsPage,

@@ -1,8 +1,7 @@
-import { jsxs as s, jsx as e, Fragment as A } from "react/jsx-runtime";
-import { createContext as D, useContext as P, useState as f, useCallback as E, useEffect as j } from "react";
-const C = D(null);
-function I() {
-  const t = P(C);
+var D;
+const w = (D = window.__HERMES_PLUGIN_SDK__) == null ? void 0 : D.React, { useState: f, useEffect: P, useCallback: A, createContext: I, useContext: j } = w, H = w.Fragment, e = w.createElement, s = w.createElement, E = I(null);
+function L() {
+  const t = j(E);
   if (!t) throw new Error("CharlieCockpitPage must provide NavigationContext");
   return t;
 }
@@ -14,8 +13,8 @@ const $ = [
   { view: "audit", label: "审计", icon: "📜" },
   { view: "search", label: "搜索", icon: "🔍" }
 ];
-function H() {
-  const { view: t, navigate: a } = I();
+function R() {
+  const { view: t, navigate: a } = L();
   return /* @__PURE__ */ s("aside", { className: "fixed inset-y-0 left-0 z-40 w-56 border-r border-slate-800 bg-slate-900/80 backdrop-blur-xl", children: [
     /* @__PURE__ */ s("div", { className: "flex h-14 items-center gap-2 border-b border-slate-800 px-5", children: [
       /* @__PURE__ */ e("span", { className: "text-lg", children: "✦" }),
@@ -41,9 +40,9 @@ function H() {
     ] }) })
   ] });
 }
-function L({ children: t }) {
+function M({ children: t }) {
   return /* @__PURE__ */ s("div", { className: "min-h-screen", children: [
-    /* @__PURE__ */ e(H, {}),
+    /* @__PURE__ */ e(R, {}),
     /* @__PURE__ */ e("main", { className: "pl-56", children: /* @__PURE__ */ e("div", { className: "mx-auto max-w-7xl px-8 py-6", children: t }) })
   ] });
 }
@@ -53,7 +52,7 @@ function m(t, a = []) {
     meta: null,
     status: "idle",
     error: null
-  }), i = E(() => {
+  }), i = A(() => {
     r((l) => ({ ...l, status: "loading" })), t().then((l) => {
       r({
         data: l.data,
@@ -70,27 +69,27 @@ function m(t, a = []) {
       });
     });
   }, a);
-  return j(() => {
+  return P(() => {
     i();
   }, [i]), { ...n, refetch: i };
 }
 const O = "/api/plugins/charlie-cockpit/v1";
-function k() {
+function S() {
   if (typeof window > "u") return null;
   const t = window.__HERMES_PLUGIN_SDK__;
   return t && typeof t.fetchJSON == "function" ? t : null;
 }
 async function p(t) {
-  if (!k())
-    throw new _(403, "host-unavailable", "仅支持 Hermes Dashboard 宿主访问");
+  if (!S())
+    throw new k(403, "host-unavailable", "仅支持 Hermes Dashboard 宿主访问");
   try {
-    return await k().fetchJSON(`${O}${t}`);
+    return await S().fetchJSON(`${O}${t}`);
   } catch (a) {
     const n = typeof a == "object" && a && "status" in a ? Number(a.status) : 0;
-    throw n === 401 || n === 403 ? new _(n, "forbidden", "无访问权限：请在受信任的 Dashboard 宿主中打开") : new _(n, "offline", "无法连接服务");
+    throw n === 401 || n === 403 ? new k(n, "forbidden", "无访问权限：请在受信任的 Dashboard 宿主中打开") : new k(n, "offline", "无法连接服务");
   }
 }
-class _ extends Error {
+class k extends Error {
   constructor(a, n, r) {
     super(r), this.code = a, this.kind = n;
   }
@@ -126,9 +125,9 @@ function b({
   return t === "success" && n ? /* @__PURE__ */ s("div", { className: "flex flex-col items-center justify-center py-16", children: [
     /* @__PURE__ */ e("div", { className: "h-12 w-12 rounded-full bg-slate-500/10 flex items-center justify-center", children: /* @__PURE__ */ e("span", { className: "text-2xl", children: "📭" }) }),
     /* @__PURE__ */ e("p", { className: "mt-3 text-sm text-slate-400", children: "暂无数据" })
-  ] }) : /* @__PURE__ */ e(A, { children: r });
+  ] }) : /* @__PURE__ */ e(H, { children: r });
 }
-const S = {
+const C = {
   fresh: { label: "新鲜", color: "text-emerald-400" },
   stale: { label: "过期", color: "text-amber-400" },
   empty: { label: "空", color: "text-slate-500" },
@@ -136,8 +135,8 @@ const S = {
   offline: { label: "离线", color: "text-slate-600" },
   conflict: { label: "冲突", color: "text-orange-400" }
 };
-function M({ freshness: t }) {
-  const a = S[t] ?? S.empty;
+function U({ freshness: t }) {
+  const a = C[t] ?? C.empty;
   return /* @__PURE__ */ s("span", { className: `inline-flex items-center gap-1 text-xs font-medium ${a.color}`, children: [
     /* @__PURE__ */ e("span", { className: "h-1.5 w-1.5 rounded-full bg-current" }),
     a.label
@@ -147,7 +146,7 @@ function x({ meta: t }) {
   if (!t) return null;
   const a = t.last_synced_at ? new Date(t.last_synced_at).toLocaleString("zh-CN") : "—";
   return /* @__PURE__ */ s("div", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400", children: [
-    /* @__PURE__ */ e(M, { freshness: t.freshness }),
+    /* @__PURE__ */ e(U, { freshness: t.freshness }),
     /* @__PURE__ */ s("span", { children: [
       "来源: ",
       /* @__PURE__ */ e("code", { className: "text-slate-300", children: t.source_ref })
@@ -162,9 +161,9 @@ function x({ meta: t }) {
     ] })
   ] });
 }
-function U() {
+function z() {
   var N, v, y, c, u;
-  const t = m(() => o.health()), a = m(() => o.tasks()), n = m(() => o.agents()), r = m(() => o.audit()), i = ((N = a.data) == null ? void 0 : N.length) ?? 0, l = ((v = n.data) == null ? void 0 : v.length) ?? 0, d = ((y = r.data) == null ? void 0 : y.length) ?? 0, h = ((c = t.data) == null ? void 0 : c.status) === "ok", w = [
+  const t = m(() => o.health()), a = m(() => o.tasks()), n = m(() => o.agents()), r = m(() => o.audit()), i = ((N = a.data) == null ? void 0 : N.length) ?? 0, l = ((v = n.data) == null ? void 0 : v.length) ?? 0, d = ((y = r.data) == null ? void 0 : y.length) ?? 0, h = ((c = t.data) == null ? void 0 : c.status) === "ok", _ = [
     { label: "服务状态", value: h ? "运行中" : "未知", icon: "⚡" },
     { label: "任务", value: String(i), icon: "📋" },
     { label: "Agent", value: String(l), icon: "🤖" },
@@ -173,7 +172,7 @@ function U() {
   return /* @__PURE__ */ s("div", { children: [
     /* @__PURE__ */ e("h1", { className: "text-xl font-semibold text-slate-100", children: "总览" }),
     /* @__PURE__ */ e("p", { className: "mt-1 text-sm text-slate-500", children: "HOAgent 运营控制台 · 只读视图" }),
-    /* @__PURE__ */ e("div", { className: "mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4", children: w.map((g) => /* @__PURE__ */ s(
+    /* @__PURE__ */ e("div", { className: "mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4", children: _.map((g) => /* @__PURE__ */ s(
       "div",
       {
         className: "group rounded-xl border border-slate-800 bg-slate-900/40 p-5",
@@ -203,7 +202,7 @@ function U() {
     a.meta && /* @__PURE__ */ e("div", { className: "mt-4", children: /* @__PURE__ */ e(x, { meta: a.meta }) })
   ] });
 }
-function z() {
+function F() {
   const { data: t, meta: a, status: n, error: r } = m(() => o.tasks()), i = !t || t.length === 0;
   return /* @__PURE__ */ s("div", { children: [
     /* @__PURE__ */ e("h1", { className: "text-xl font-semibold text-slate-100", children: "任务" }),
@@ -221,7 +220,7 @@ function z() {
       /* @__PURE__ */ e("tbody", { className: "divide-y divide-slate-800/60", children: t == null ? void 0 : t.map((l) => /* @__PURE__ */ s("tr", { className: "hover:bg-slate-800/30", children: [
         /* @__PURE__ */ e("td", { className: "px-4 py-3 font-mono text-xs text-slate-400", children: l.task_id }),
         /* @__PURE__ */ e("td", { className: "px-4 py-3 text-slate-200", children: l.title ?? "—" }),
-        /* @__PURE__ */ e("td", { className: "px-4 py-3", children: /* @__PURE__ */ e(R, { status: l.status }) }),
+        /* @__PURE__ */ e("td", { className: "px-4 py-3", children: /* @__PURE__ */ e(G, { status: l.status }) }),
         /* @__PURE__ */ e("td", { className: "px-4 py-3 text-slate-400", children: l.priority ?? "—" }),
         /* @__PURE__ */ e("td", { className: "px-4 py-3 text-slate-400", children: l.owner_ref ?? "—" }),
         /* @__PURE__ */ e("td", { className: "px-4 py-3 text-xs text-slate-500", children: l.updated_at ? new Date(l.updated_at).toLocaleString("zh-CN") : "—" })
@@ -229,7 +228,7 @@ function z() {
     ] }) }) })
   ] });
 }
-function R({ status: t }) {
+function G({ status: t }) {
   const n = {
     done: "bg-emerald-500/10 text-emerald-400",
     completed: "bg-emerald-500/10 text-emerald-400",
@@ -262,7 +261,7 @@ function B() {
     ] }) }) })
   ] });
 }
-function F() {
+function K() {
   var n, r;
   const t = m(() => o.entities()), a = m(() => o.relationships());
   return /* @__PURE__ */ s("div", { children: [
@@ -310,7 +309,7 @@ function F() {
     ] })
   ] });
 }
-function G() {
+function V() {
   const { data: t, meta: a, status: n, error: r } = m(() => o.audit()), i = !t || t.length === 0;
   return /* @__PURE__ */ s("div", { children: [
     /* @__PURE__ */ e("h1", { className: "text-xl font-semibold text-slate-100", children: "审计" }),
@@ -332,8 +331,8 @@ function G() {
     ] }) }) })
   ] });
 }
-function V() {
-  const [t, a] = f(""), [n, r] = f(null), [i, l] = f(null), [d, h] = f("idle"), [w, N] = f(null), v = (c) => {
+function q() {
+  const [t, a] = f(""), [n, r] = f(null), [i, l] = f(null), [d, h] = f("idle"), [_, N] = f(null), v = (c) => {
     c.preventDefault(), t.trim() && (h("loading"), o.search(t).then((u) => {
       r(u.data), l(u.meta), h("success"), N(null);
     }).catch((u) => {
@@ -365,7 +364,7 @@ function V() {
       )
     ] }),
     i && /* @__PURE__ */ e("div", { className: "mt-4", children: /* @__PURE__ */ e(x, { meta: i }) }),
-    d !== "idle" && /* @__PURE__ */ e("div", { className: "mt-4 space-y-2", children: /* @__PURE__ */ e(b, { status: d, error: w, empty: y, children: n == null ? void 0 : n.map((c) => /* @__PURE__ */ s(
+    d !== "idle" && /* @__PURE__ */ e("div", { className: "mt-4 space-y-2", children: /* @__PURE__ */ e(b, { status: d, error: _, empty: y, children: n == null ? void 0 : n.map((c) => /* @__PURE__ */ s(
       "div",
       {
         className: "rounded-lg border border-slate-800 bg-slate-900/40 p-4",
@@ -392,19 +391,19 @@ function V() {
     )) }) })
   ] });
 }
-const q = {
-  overview: U,
-  tasks: z,
+const J = {
+  overview: z,
+  tasks: F,
   agents: B,
-  business: F,
-  audit: G,
-  search: V
+  business: K,
+  audit: V,
+  search: q
 };
-function J() {
-  const [t, a] = f("overview"), n = q[t];
-  return /* @__PURE__ */ e(C.Provider, { value: { view: t, navigate: a }, children: /* @__PURE__ */ e(L, { children: /* @__PURE__ */ e(n, {}) }) });
+function T() {
+  const [t, a] = f("overview"), n = J[t];
+  return /* @__PURE__ */ e(E.Provider, { value: { view: t, navigate: a }, children: /* @__PURE__ */ e(M, { children: /* @__PURE__ */ e(n, {}) }) });
 }
-typeof window < "u" && window.HERMES_PLUGINS && window.HERMES_PLUGINS.register("charlie-cockpit", J);
+typeof window < "u" && window.HERMES_PLUGINS && window.HERMES_PLUGINS.register("charlie-cockpit", T);
 export {
-  J as CharlieCockpitPage
+  T as CharlieCockpitPage
 };

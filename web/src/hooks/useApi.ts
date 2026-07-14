@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from '@/host-react';
 import { api, ApiError } from '@/lib/api';
 import type { ApiResponse } from '@/types/api';
 
