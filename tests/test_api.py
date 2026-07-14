@@ -26,6 +26,17 @@ def test_readonly_endpoints_return_real_meta(tmp_path):
     assert body['meta']['freshness'] == 'stale'
     assert body['meta']['last_synced_at'] == '2026-01-01T00:00:00Z'
 
+def test_unknown_freshness_returns_unknown(tmp_path):
+    """sync_state='unknown' maps to freshness='unknown' in API meta."""
+    db = tmp_path / 'ops.db'
+    client = TestClient(create_app(db))
+    conn = connect(db)
+    conn.execute("INSERT INTO source_cursor VALUES ('s2','test','safe://s2','hash2','2026-01-01T00:00:00Z','unknown')")
+    conn.close()
+    body = client.get('/api/plugins/charlie-cockpit/v1/health').json()
+    assert body['meta']['freshness'] == 'unknown'
+    assert body['meta']['last_synced_at'] == '2026-01-01T00:00:00Z'
+
 def test_no_auth_logic_in_app():
     """Verify the standalone app has zero auth dependencies or token logic."""
     import inspect

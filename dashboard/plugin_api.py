@@ -95,7 +95,9 @@ def _source_meta(db_path: Path, source_refs: list[str] | None = None) -> dict:
     if not selected:
         return {"source_ref": "projection://empty", "source_hash": "", "last_synced_at": None, "freshness": "empty"}
     states = {r["sync_state"] for r in selected}
-    if "conflict" in states:
+    if "unknown" in states:
+        freshness = "unknown"
+    elif "conflict" in states:
         freshness = "conflict"
     elif "offline" in states:
         freshness = "offline"

@@ -4,13 +4,14 @@ from cockpit.db import connect, migrate_down, migrate_up
 
 def test_up_down_and_integrity(tmp_path):
     db = tmp_path / 'ops.db'
-    assert migrate_up(db) == '005_document_revocation_cascade'
+    assert migrate_up(db) == '006_sync_state_unknown'
     conn = connect(db)
     assert conn.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
     assert conn.execute('PRAGMA foreign_key_check').fetchall() == []
     assert conn.execute('PRAGMA journal_mode').fetchone()[0].lower() == 'wal'
     conn.close()
     # Full down-migration chain
+    assert migrate_down(db) == '006_sync_state_unknown'
     assert migrate_down(db) == '005_document_revocation_cascade'
     assert migrate_down(db) == '004_governance_knowledge_fts'
     assert migrate_down(db) == '003_temporal_update_guard'
@@ -67,7 +68,11 @@ def test_migration_005_down_reversible(tmp_path):
     conn = connect(db)
     assert conn.execute("SELECT name FROM sqlite_master WHERE type='trigger' AND name='trg_knowledge_document_revoked'").fetchone() is not None
     conn.close()
-    # Down removes trigger
+    # Down removes 006 first (not the trigger)
+    assert migrate_down(db) == '006_sync_state_unknown'
+    conn = connect(db)
+    assert conn.execute("SELECT name FROM sqlite_master WHERE type='trigger' AND name='trg_knowledge_document_revoked'").fetchone() is not None
+    # Down again removes 005 trigger
     assert migrate_down(db) == '005_document_revocation_cascade'
     conn = connect(db)
     assert conn.execute("SELECT name FROM sqlite_master WHERE type='trigger' AND name='trg_knowledge_document_revoked'").fetchone() is None
