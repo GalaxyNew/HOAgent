@@ -2,16 +2,26 @@ import type { ApiResponse } from '@/types/api';
 
 const API_BASE = '/api/plugins/charlie-cockpit/v1';
 
-function getAuthHeader(): Record<string, string> {
-  // Authentication is injected exclusively by the trusted Hermes Dashboard host.
-  // This plugin must never contain, generate, or fall back to a client-side token.
-  return {};
+interface HermesPluginSdk {
+  // The trusted Dashboard host owns authentication and may transparently proxy requests.
+  readonly request?: unknown;
+}
+
+function getTrustedHostSdk(): HermesPluginSdk | null {
+  if (typeof window === 'undefined') return null;
+  const sdk = (window as Window & { __HERMES_PLUGIN_SDK__?: HermesPluginSdk })
+    .__HERMES_PLUGIN_SDK__;
+  return sdk ?? null;
 }
 
 async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
-  const resp = await fetch(`${API_BASE}${path}`, {
-    headers: getAuthHeader(),
-  });
+  // Fail closed before any network activity when the plugin is opened outside
+  // the trusted Hermes Dashboard host. No client-side token or fallback exists.
+  if (!getTrustedHostSdk()) {
+    throw new ApiError(401, 'host-unavailable', '仅支持 Hermes Dashboard 宿主访问');
+  }
+
+  const resp = await fetch(`${API_BASE}${path}`);
 
   if (resp.status === 401 || resp.status === 403) {
     throw new ApiError(resp.status, 'forbidden', '无访问权限：请在受信任的 Dashboard 宿主中打开');

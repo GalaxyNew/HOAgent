@@ -22,16 +22,17 @@ export function StateContainer({
 
   if (status === 'error' && error) {
     const isForbidden = error.kind === 'forbidden';
+    const isHostUnavailable = error.kind === 'host-unavailable';
     const isOffline = error.kind === 'offline';
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <div className={`h-12 w-12 rounded-full ${isForbidden ? 'bg-red-500/10' : isOffline ? 'bg-slate-500/10' : 'bg-amber-500/10'} flex items-center justify-center`}>
+        <div className={`h-12 w-12 rounded-full ${isForbidden || isHostUnavailable ? 'bg-red-500/10' : isOffline ? 'bg-slate-500/10' : 'bg-amber-500/10'} flex items-center justify-center`}>
           <span className="text-2xl">
-            {isForbidden ? '🔒' : isOffline ? '📡' : '⚠️'}
+            {isForbidden || isHostUnavailable ? '🔒' : isOffline ? '📡' : '⚠️'}
           </span>
         </div>
         <p className="mt-3 text-sm font-medium text-slate-200">
-          {isForbidden ? '403 禁止访问' : isOffline ? '服务离线' : '请求出错'}
+          {isHostUnavailable ? '仅支持 Hermes Dashboard 宿主访问' : isForbidden ? '403 禁止访问' : isOffline ? '服务离线' : '请求出错'}
         </p>
         <p className="mt-1 text-xs text-slate-500">{error.message}</p>
       </div>
