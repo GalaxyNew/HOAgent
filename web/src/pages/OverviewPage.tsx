@@ -2,7 +2,6 @@ import { useApi } from '@/hooks/useApi';
 import { api } from '@/lib/api';
 import { StateContainer } from '@/components/StateContainer';
 import { SourceMetaCard } from '@/components/SourceMeta';
-import { Link } from 'react-router-dom';
 
 export function OverviewPage() {
   const health = useApi(() => api.health());
@@ -16,10 +15,10 @@ export function OverviewPage() {
   const serviceUp = health.data?.status === 'ok';
 
   const cards = [
-    { label: '服务状态', value: serviceUp ? '运行中' : '未知', icon: '⚡', to: '/' },
-    { label: '任务', value: String(taskCount), icon: '📋', to: '/tasks' },
-    { label: 'Agent', value: String(agentCount), icon: '🤖', to: '/agents' },
-    { label: '审计事件', value: String(auditCount), icon: '📜', to: '/audit' },
+    { label: '服务状态', value: serviceUp ? '运行中' : '未知', icon: '⚡' },
+    { label: '任务', value: String(taskCount), icon: '📋' },
+    { label: 'Agent', value: String(agentCount), icon: '🤖' },
+    { label: '审计事件', value: String(auditCount), icon: '📜' },
   ];
 
   return (
@@ -29,10 +28,9 @@ export function OverviewPage() {
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {cards.map((c) => (
-          <Link
+          <div
             key={c.label}
-            to={c.to}
-            className="group rounded-xl border border-slate-800 bg-slate-900/40 p-5 transition-colors hover:border-slate-700 hover:bg-slate-900/70"
+            className="group rounded-xl border border-slate-800 bg-slate-900/40 p-5"
           >
             <div className="flex items-center justify-between">
               <span className="text-2xl">{c.icon}</span>
@@ -42,7 +40,7 @@ export function OverviewPage() {
             </div>
             <p className="mt-3 text-2xl font-semibold text-slate-100">{c.value}</p>
             <p className="text-xs text-slate-500 group-hover:text-slate-400">{c.label}</p>
-          </Link>
+          </div>
         ))}
       </div>
 

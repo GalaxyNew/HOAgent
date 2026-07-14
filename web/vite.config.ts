@@ -1,22 +1,26 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': resolve(__dirname, 'src') } },
-  server: {
-    host: '127.0.0.1',
-    port: 5180,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:18734',
-        changeOrigin: true,
+  build: {
+    outDir: resolve(__dirname, '../dashboard/dist'),
+    emptyOutDir: true,
+    sourcemap: false,
+    lib: {
+      entry: resolve(__dirname, 'src/plugin.tsx'),
+      formats: ['es'],
+      fileName: () => 'index.js',
+      cssFileName: 'style',
+    },
+    rollupOptions: {
+      // React is supplied by the Hermes Dashboard host; it must not be bundled.
+      external: ['react', 'react/jsx-runtime'],
+      output: {
+        globals: { react: 'React' },
       },
     },
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-  },
-})
+});

@@ -1,0 +1,7 @@
+{
+  "id": "charlie-cockpit",
+  "name": "Charlie Cockpit",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "css": "dist/style.css"
+}
