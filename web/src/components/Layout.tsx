@@ -13,14 +13,14 @@ const navItems: { view: View; label: string; icon: string }[] = [
 export function Sidebar() {
   const { view, navigate } = useNavigation();
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 w-56 border-r border-slate-800 bg-slate-900/80 backdrop-blur-xl">
-      <div className="flex h-14 items-center gap-2 border-b border-slate-800 px-5">
+    <aside className="cockpit-sidebar fixed inset-y-0 left-0 z-40 w-56 border-r border-[#D6E1DB] bg-white/90 backdrop-blur-xl">
+      <div className="flex h-14 items-center gap-2 border-b border-[#D6E1DB] px-5">
         <span className="text-lg">✦</span>
-        <span className="text-sm font-semibold tracking-tight text-slate-100">
+        <span className="text-sm font-semibold tracking-tight text-[#12201C]">
           Charlie Cockpit
         </span>
       </div>
-      <nav className="space-y-0.5 p-3">
+      <nav className="cockpit-nav space-y-0.5 p-3">
         {navItems.map((item) => (
           <button
             key={item.view}
@@ -28,8 +28,8 @@ export function Sidebar() {
             onClick={() => navigate(item.view)}
             className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
               view === item.view
-                ? 'bg-indigo-500/10 text-indigo-300'
-                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                ? 'bg-[#DDF3EC] text-[#0F766E]'
+                : 'text-[#64716B] hover:bg-[#EAF2EE] hover:text-[#12201C]'
             }`}
           >
             <span className="text-base">{item.icon}</span>
@@ -37,8 +37,8 @@ export function Sidebar() {
           </button>
         ))}
       </nav>
-      <div className="absolute bottom-0 w-full border-t border-slate-800 p-4">
-        <p className="text-xs text-slate-600">
+      <div className="cockpit-sidebar-footer absolute bottom-0 w-full border-t border-[#D6E1DB] p-4">
+        <p className="text-xs text-[#809089]">
           HOAgent · 只读模式
           <br />
           v0.1.0 MVP
@@ -52,8 +52,8 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <Sidebar />
-      <main className="pl-56">
-        <div className="mx-auto max-w-7xl px-8 py-6">{children}</div>
+      <main className="cockpit-main pl-56">
+        <div className="cockpit-content mx-auto max-w-7xl px-8 py-8">{children}</div>
       </main>
     </div>
   );

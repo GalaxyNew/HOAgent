@@ -1,12 +1,12 @@
 import type { SourceMeta } from '@/types/api';
 
 const freshnessConfig: Record<string, { label: string; color: string }> = {
-  fresh: { label: '新鲜', color: 'text-emerald-400' },
-  stale: { label: '过期', color: 'text-amber-400' },
-  empty: { label: '空', color: 'text-slate-500' },
-  error: { label: '错误', color: 'text-red-400' },
-  offline: { label: '离线', color: 'text-slate-600' },
-  conflict: { label: '冲突', color: 'text-orange-400' },
+  fresh: { label: '新鲜', color: 'text-[#0F766E]' },
+  stale: { label: '过期', color: 'text-[#B45309]' },
+  empty: { label: '空', color: 'text-[#64716B]' },
+  error: { label: '错误', color: 'text-[#B42318]' },
+  offline: { label: '离线', color: 'text-[#809089]' },
+  conflict: { label: '冲突', color: 'text-[#B45309]' },
 };
 
 export function FreshnessBadge({ freshness }: { freshness: string }) {
@@ -25,11 +25,11 @@ export function SourceMetaCard({ meta }: { meta: SourceMeta | null }) {
     ? new Date(meta.last_synced_at).toLocaleString('zh-CN')
     : '—';
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#64716B]">
       <FreshnessBadge freshness={meta.freshness} />
-      <span>来源: <code className="text-slate-300">{meta.source_ref}</code></span>
+      <span>来源: <code className="text-[#263B34]">{meta.source_ref}</code></span>
       {meta.source_hash && (
-        <span>哈希: <code className="text-slate-300">{meta.source_hash.slice(0, 8)}</code></span>
+        <span>哈希: <code className="text-[#263B34]">{meta.source_hash.slice(0, 8)}</code></span>
       )}
       <span>同步: {time}</span>
     </div>
