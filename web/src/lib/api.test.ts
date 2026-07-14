@@ -35,6 +35,17 @@ describe('trusted Dashboard host boundary', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
+  it('fails closed when SDK fetchJSON is not a function and makes zero API requests', async () => {
+    window.__HERMES_PLUGIN_SDK__ = { fetchJSON: null } as unknown as typeof window.__HERMES_PLUGIN_SDK__;
+
+    await expect(api.health()).rejects.toMatchObject({
+      code: 403,
+      kind: 'host-unavailable',
+      message: '仅支持 Hermes Dashboard 宿主访问',
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('uses only trusted SDK fetchJSON when it is present', async () => {
     const fetchJSON = vi.fn().mockResolvedValue({
       data: { status: 'ok', service: 'test' },
