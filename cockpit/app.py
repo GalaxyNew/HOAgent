@@ -40,12 +40,33 @@ def source_meta(db: Path, source_refs: list[str] | None = None) -> dict:
 def response(request: Request, db: Path, data: object, source_refs: list[str] | None = None) -> JSONResponse:
     meta=source_meta(db, source_refs); meta['request_id']=request.headers.get("x-request-id", str(uuid.uuid4()))
     return JSONResponse({"data":data,"meta":meta})
+# Server-side token→scope mapping. Tokens are never accepted from client-supplied scope headers.
+# Loading is lazy per-request so env changes (e.g. test monkeypatch) take effect immediately.
+DEFAULT_DEV_TOKEN = 'charlie-cockpit-dev-read-token'
+
+def _load_token_scopes() -> dict[str, frozenset[str]]:
+    """Load token→scopes from env. Supports JSON mapping or single legacy token."""
+    import json
+    raw = os.getenv('CHARLIE_COCKPIT_TOKEN_SCOPES', '')
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            return {k: frozenset(v) for k, v in parsed.items()}
+        except Exception:
+            pass
+    legacy = os.getenv('CHARLIE_COCKPIT_READ_TOKEN')
+    if legacy:
+        return {legacy: frozenset({READ_SCOPE})}
+    # Dev/default mode: emit a single read-only token so the service is usable locally.
+    # In production, set CHARLIE_COCKPIT_TOKEN_SCOPES or CHARLIE_COCKPIT_READ_TOKEN.
+    return {DEFAULT_DEV_TOKEN: frozenset({READ_SCOPE})}
+
 def require_read_scope(request: Request) -> None:
-    expected=os.getenv('CHARLIE_COCKPIT_READ_TOKEN')
-    supplied=request.headers.get('authorization','').removeprefix('Bearer ')
-    scopes=set(request.headers.get('x-charlie-scopes','').split())
-    if not expected or supplied != expected or READ_SCOPE not in scopes:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='read scope required')
+    supplied = request.headers.get('authorization', '').removeprefix('Bearer ').strip()
+    token_scopes = _load_token_scopes()
+    scopes = token_scopes.get(supplied, frozenset())
+    if READ_SCOPE not in scopes:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='forbidden')
 
 def create_app(db_path: Path | None = None) -> FastAPI:
     db=db_path or DB_PATH; db.parent.mkdir(parents=True, exist_ok=True); migrate_up(db)
@@ -69,6 +90,16 @@ def create_app(db_path: Path | None = None) -> FastAPI:
     def audit(request: Request):
         result=rows(db,'SELECT * FROM audit_event ORDER BY occurred_at DESC'); return response(request,db,result,[r['source_ref'] for r in result])
     @router.get('/search')
-    def search(request: Request, q: str=''): return response(request,db,[] if not q.strip() else rows(db,"SELECT rowid,title_masked,summary_masked,tags FROM search_fts WHERE search_fts MATCH ?",(q,)))
+    def search(request: Request, q: str=''):
+        if not q.strip(): return response(request, db, [])
+        result = rows(db,
+            "SELECT c.chunk_id, c.document_id, c.title_masked, c.summary_masked, c.tags "
+            "FROM knowledge_chunk_fts f "
+            "JOIN knowledge_chunk c ON c.chunk_id = f.rowid "
+            "JOIN knowledge_document d ON d.document_id = c.document_id "
+            "WHERE knowledge_chunk_fts MATCH ? "
+            "AND c.deleted_at IS NULL AND d.status = 'active' AND d.deleted_at IS NULL",
+            (q,))
+        return response(request, db, result)
     app.include_router(router); return app
 app=create_app()
