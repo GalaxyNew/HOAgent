@@ -22,17 +22,17 @@ export function AuditPage() {
             <thead>
               <tr className="border-b border-slate-800 bg-slate-900/60 text-xs uppercase tracking-wide text-slate-500">
                 <th className="px-4 py-3 text-left font-medium">事件 ID</th>
-                <th className="px-4 py-3 text-left font-medium">Agent</th>
+                <th className="px-4 py-3 text-left font-medium">结果</th>
                 <th className="px-4 py-3 text-left font-medium">动作</th>
                 <th className="px-4 py-3 text-left font-medium">发生时间</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {data?.map((e: any) => (
-                <tr key={e.event_id} className="hover:bg-slate-800/30">
-                  <td className="px-4 py-3 font-mono text-xs text-slate-400">{e.event_id}</td>
-                  <td className="px-4 py-3 text-slate-200">{e.agent_id ?? '—'}</td>
-                  <td className="px-4 py-3 text-slate-400">{e.action ?? '—'}</td>
+                <tr key={e.audit_id} className="hover:bg-slate-800/30">
+                  <td className="px-4 py-3 font-mono text-xs text-slate-400">{e.audit_id}</td>
+                  <td className="px-4 py-3 text-slate-400">{e.result ?? '—'}</td>
+                  <td className="px-4 py-3 text-slate-200">{e.action ?? '—'}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">
                     {e.occurred_at ? new Date(e.occurred_at).toLocaleString('zh-CN') : '—'}
                   </td>

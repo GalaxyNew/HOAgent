@@ -33,7 +33,7 @@ export function BusinessPage() {
                   <tr key={e.entity_id} className="hover:bg-slate-800/30">
                     <td className="px-4 py-3 font-mono text-xs text-slate-400">{e.entity_id}</td>
                     <td className="px-4 py-3 text-slate-200">{e.name ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-400">{e.type ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-400">{e.entity_kind ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -64,9 +64,9 @@ export function BusinessPage() {
                 {rels.data?.map((r: any) => (
                   <tr key={r.relationship_id} className="hover:bg-slate-800/30">
                     <td className="px-4 py-3 font-mono text-xs text-slate-400">{r.relationship_id}</td>
-                    <td className="px-4 py-3 text-slate-200">{r.from_entity ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-200">{r.to_entity ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-400">{r.kind ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-200">{r.left_entity_id ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-200">{r.right_entity_id ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-400">{r.relation_type ?? '—'}</td>
                     <td className="px-4 py-3 text-xs text-slate-500">
                       {r.effective_from ? new Date(r.effective_from).toLocaleDateString('zh-CN') : '—'}
                     </td>

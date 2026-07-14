@@ -1,4 +1,5 @@
 // ---- Shared API types ----
+// Aligned with T-34 backend HEAD=133e12a real response schema.
 
 export interface SourceMeta {
   source_ref: string;
@@ -13,17 +14,18 @@ export interface ApiResponse<T> {
   meta: SourceMeta;
 }
 
-// ---- Domain types ----
+// ---- Domain types (backend-accurate field names) ----
 
 export interface Task {
   task_id: string;
   title: string;
   status: string;
   priority: string;
-  owner: string;
-  created_at: string;
-  updated_at: string;
+  owner_ref: string;
+  parent_task_id: string | null;
   source_ref: string;
+  source_hash: string;
+  updated_at: string;
 }
 
 export interface Agent {
@@ -31,35 +33,54 @@ export interface Agent {
   name: string;
   role: string;
   status: string;
+  registry_ref: string;
   source_ref: string;
+  source_hash: string;
+  updated_at: string;
 }
 
 export interface BusinessEntity {
   entity_id: string;
+  entity_kind: string;
   name: string;
-  type: string;
+  status: string;
+  effective_from: string;
+  effective_to: string | null;
+  source_type: string;
   source_ref: string;
+  source_hash: string;
+  updated_at: string;
+  responsibility_chain: string;
 }
 
 export interface BusinessRelationship {
   relationship_id: string;
-  from_entity: string;
-  to_entity: string;
-  kind: string;
+  left_entity_id: string;
+  right_entity_id: string;
+  relation_type: string;
+  responsibility: string;
+  status: string;
   effective_from: string;
+  effective_to: string | null;
   source_ref: string;
+  source_hash: string;
+  source_type: string;
+  responsibility_chain: string;
 }
 
 export interface AuditEvent {
-  event_id: string;
-  agent_id: string;
-  action: string;
+  audit_id: string;
   occurred_at: string;
+  action: string;
+  result: string;
+  request_id: string;
   source_ref: string;
+  source_hash: string;
+  masked_detail: string;
 }
 
 export interface SearchResult {
-  chunk_id: string;
+  chunk_id: number;
   document_id: string;
   title_masked: string;
   summary_masked: string;

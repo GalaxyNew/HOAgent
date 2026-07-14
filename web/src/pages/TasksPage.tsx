@@ -38,7 +38,7 @@ export function TasksPage() {
                     <StatusPill status={t.status} />
                   </td>
                   <td className="px-4 py-3 text-slate-400">{t.priority ?? '—'}</td>
-                  <td className="px-4 py-3 text-slate-400">{t.owner ?? '—'}</td>
+                  <td className="px-4 py-3 text-slate-400">{t.owner_ref ?? '—'}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">
                     {t.updated_at ? new Date(t.updated_at).toLocaleString('zh-CN') : '—'}
                   </td>
