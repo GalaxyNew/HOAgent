@@ -3,15 +3,15 @@ import type { ApiResponse } from '@/types/api';
 const API_BASE = '/api/plugins/charlie-cockpit/v1';
 
 interface HermesPluginSdk {
-  // The trusted Dashboard host owns authentication and may transparently proxy requests.
-  readonly request?: unknown;
+  // Trusted Dashboard API: host owns session authentication and proxy headers.
+  fetchJSON<T>(path: string): Promise<T>;
 }
 
 export function getTrustedHostSdk(): HermesPluginSdk | null {
   if (typeof window === 'undefined') return null;
   const sdk = (window as Window & { __HERMES_PLUGIN_SDK__?: HermesPluginSdk })
     .__HERMES_PLUGIN_SDK__;
-  return sdk ?? null;
+  return sdk && typeof sdk.fetchJSON === 'function' ? sdk : null;
 }
 
 async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
@@ -21,16 +21,17 @@ async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
     throw new ApiError(403, 'host-unavailable', '仅支持 Hermes Dashboard 宿主访问');
   }
 
-  const resp = await fetch(`${API_BASE}${path}`);
-
-  if (resp.status === 401 || resp.status === 403) {
-    throw new ApiError(resp.status, 'forbidden', '无访问权限：请在受信任的 Dashboard 宿主中打开');
+  try {
+    return await getTrustedHostSdk()!.fetchJSON<ApiResponse<T>>(`${API_BASE}${path}`);
+  } catch (error) {
+    const status = typeof error === 'object' && error && 'status' in error
+      ? Number((error as { status: unknown }).status)
+      : 0;
+    if (status === 401 || status === 403) {
+      throw new ApiError(status, 'forbidden', '无访问权限：请在受信任的 Dashboard 宿主中打开');
+    }
+    throw new ApiError(status, 'offline', '无法连接服务');
   }
-  if (resp.status === 0 || !resp.ok) {
-    throw new ApiError(resp.status || 0, 'offline', '无法连接服务');
-  }
-
-  return resp.json();
 }
 
 export class ApiError extends Error {

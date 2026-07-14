@@ -24,14 +24,15 @@ describe('trusted Dashboard host boundary', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('allows a request only when a trusted SDK is present', async () => {
-    window.__HERMES_PLUGIN_SDK__ = {};
-    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({
+  it('uses only trusted SDK fetchJSON when it is present', async () => {
+    const fetchJSON = vi.fn().mockResolvedValue({
       data: { status: 'ok', service: 'test' },
       meta: { source_ref: 'test', source_hash: '', last_synced_at: null, freshness: 'fresh' },
-    }), { status: 200 }));
+    });
+    window.__HERMES_PLUGIN_SDK__ = { fetchJSON };
 
     await expect(api.health()).resolves.toMatchObject({ data: { status: 'ok' } });
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetchJSON).toHaveBeenCalledWith('/api/plugins/charlie-cockpit/v1/health');
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

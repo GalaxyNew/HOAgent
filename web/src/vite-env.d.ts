@@ -2,6 +2,6 @@
 
 interface Window {
   __HERMES_PLUGIN_SDK__?: {
-    readonly request?: unknown;
+    fetchJSON<T>(path: string): Promise<T>;
   };
 }
